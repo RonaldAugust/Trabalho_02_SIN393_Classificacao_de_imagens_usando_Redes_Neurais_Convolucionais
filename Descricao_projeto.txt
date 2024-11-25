@@ -1,0 +1,48 @@
+Descricao_projeto
+DATASET
+https://www.kaggle.com/datasets/andrewmvd/lung-and-colon-cancer-histopathological-images
+
+modelos de CNN
+https://pytorch.org/vision/stable/models.html
+
+Utilizar validação cruzada hold-out com divisão do dataset em
+conjuntos de treino, validação e teste
+
+Realizar avaliação do desempenho utilizando:
+ Matriz de Confusão.
+ Métricas: Acurácia, Precisão, Recall e F1-score
+
+Adicionais opcionais:
+ Implementar otimização de hiperparâmetros.
+ Aplicar estratégias de aumento de dados (data augmentation).
+
+O artigo deve ter de 4 a 6 páginas e incluir as seguintes seções obrigató
+1. Introdução.
+2. Revisão Bibliográfica (mínimo de 4 trabalhos recentes relacionados ao
+tema).
+3. Material e Métodos.
+4. Resultados e Discussão.
+5. Conclusão.
+6. Referências Bibliográficas.
+
+Apresentação
+Criar um vídeo de 10 minutos apresentando o projeto, abordando as etapas
+realizadas e os principais resultados.
+o Publicar o vídeo no YouTube (pode ser em modo não listado) e compartilhar o
+link.
+
+Relatório e Documentação Final
+o Repositório no GitHub:
+ Publicar o código em um repositório público.
+ Incluir um arquivo README com:
+ Descrição detalhada do projeto.
+ Instruções de execução (dependências, requisitos e etapas).
+ Link para o vídeo de apresentação no YouTube.
+
+Datas Importantes
+ 26/11/2024: Prazo para envio do link do dataset no PVANet Moodle.
+ 17/01/2024: Entrega final do projeto (link do repositório do GitHub) via PVANet
+Moodle
+
+Recursos
+https://github.com/joaofmari/awesome-computer-vision-deep-learning
