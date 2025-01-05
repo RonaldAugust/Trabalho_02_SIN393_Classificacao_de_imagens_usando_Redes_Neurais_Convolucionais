@@ -1,0 +1,22 @@
+# Trabalho_02_SIN393_Classifica-o_de_imagens_usando_Redes_Neurais_Convolucionais
+Segundo projeto dedicado a disciplina SIN393 visão computacional de classificação de imagens utilizando redes neurais convolucionais (CNNs), incluindo experimentação, análise de resultados, documentação e apresentação.
+
+Como rodar o projeto:
+1 -  instale o anaconda:
+    https://www.anaconda.com/products/individual
+    Configurar o terminal do anaconda para o vscode:
+        Aperte Ctrl+Shift+P e digite "Python: Select Interpreter" e selecione o interprete Python do seu ambiente conda.
+
+2 - crie um ambiente virtual 
+    conda create --name projeto_visao python=3.8 (versao instalada na maquina)
+
+3 - Ative o ambiente:
+    conda activate projeto_visao
+
+4 - Instale o pip no conda para instalação do requirements.txt:
+    conda install pip
+
+5 - Instale as dependencias atraves do pip:
+    pip install -r requirements.txt
+    Verifique se a instalação foi feita:
+    pip list
