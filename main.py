@@ -1,5 +1,4 @@
 from functions import criar_dataloaders, menu_modelo, treinar_validar_e_testar, avaliar_e_imprimir_resultados
-
 import torch
 from torchvision import transforms, datasets
 from torch import nn, optim
@@ -9,7 +8,7 @@ dispositivo = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print('\nDispositivo: {0}'.format(dispositivo))
 
 #diretorios
-diretorio_origem = 'C:\\Users\\Ronald\\Documents\\Disciplinas\\Visao_computacional\\proj_final\\DATASET_HISTOPATOLOGICAS_PULMAO_COLON_LC25000'
+diretorio_origem = 'C:\\Users\\Ronald\\Documents\\Disciplinas\\Visao_computacional\\projeto_final_visao_computacional\\DATASET_HISTOPATOLOGICAS_PULMAO_COLON_LC25000'
 
 data_transforms = transforms.Compose([
     transforms.Resize((224, 224)), #redimensionamento

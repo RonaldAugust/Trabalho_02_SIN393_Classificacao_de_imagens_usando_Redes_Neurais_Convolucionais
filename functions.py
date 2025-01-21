@@ -4,6 +4,7 @@ import numpy as np
 from sklearn import metrics
 from torchvision import models
 import torch.nn as nn
+import numpy as np
 
 def criar_dataloaders(dataset_completo, batch_size):
     # Conjunto de treinamento: 70 %
@@ -36,7 +37,7 @@ def menu_modelo(classes):
     
     print("Escolha um modelo para inicializar:")
     print("1. AlexNet")
-    print("2. VGG16")
+    print("2. SqueezeNet")
     print("3. ResNet18")
     print("4. Sair")
     
@@ -45,7 +46,7 @@ def menu_modelo(classes):
     if escolha == "1":
         nome_modelo = "alexnet"
     elif escolha == "2":
-        nome_modelo = "vgg"
+        nome_modelo = "SqueezeNet"
     elif escolha == "3":
         nome_modelo = "ResNet18"
     elif escolha == "4":
@@ -56,19 +57,18 @@ def menu_modelo(classes):
 
     # Inicializar o modelo com base na escolha
     modelo = None
-    tamanho_entrada = 0
 
     if nome_modelo == "alexnet":
         modelo = models.alexnet(weights='DEFAULT')
         num_ftrs = modelo.classifier[6].in_features
-        # Altera o número de neurônios na cadama de saída.
         modelo.classifier[6] = nn.Linear(num_ftrs, num_classes)
 
-    elif nome_modelo == "vgg":
-        modelo = models.vgg16(weights='DEFAULT')
-        num_ftrs = modelo.classifier[6].in_features
-        modelo.classifier[6] = nn.Linear(num_ftrs, num_classes)
-        
+    elif nome_modelo == "SqueezeNet":
+        modelo = models.squeezenet1_1(weights='DEFAULT')
+        num_ftrs = modelo.classifier[1].in_channels  # "in_channels" é a entrada da camada final
+        modelo.classifier[1] = nn.Conv2d(num_ftrs, num_classes, kernel_size=(1, 1), stride=(1, 1))  # Substitui por uma camada Conv2d
+        modelo.classifier[1].bias = nn.Parameter(torch.zeros(num_classes))  # Se necessário, inicializa o viés da camada final
+
     elif nome_modelo == "ResNet18":
         modelo = models.resnet18(weights='DEFAULT')
         num_ftrs = modelo.fc.in_features
@@ -98,9 +98,9 @@ def treinar_validar_e_testar(modelo, train_dataloader, val_dataloader, test_data
     test_acc_list = []
 
     modelo = modelo.to(DEVICE)
+    print('treino iniciado\n')
 
     for epoch in range(epochs):
-        print('treino iniciado\n')
         time_epoch_start = time.time()
         
         # Inicia contagem de tempo da época 
@@ -260,45 +260,3 @@ def avaliar_e_imprimir_resultados(modelo, val_dataloader, dispositivo, class_nam
     acc_val = metrics.accuracy_score(true_val_list, pred_val_list)
     print('\nValidation Accuracy: {:.4f}'.format(acc_val))
 
-    # Imprime os resultados de treinamento, validação e teste
-    imprimir_resultados_com_matriz(resultado, true_val_list, pred_val_list, class_names)
-
-def imprimir_resultados_com_matriz(resultado, true_val_list, pred_val_list, class_names):
-    # Descompacta os valores da variável resultado
-    train_loss_list, val_loss_list, train_acc_list, val_acc_list, test_loss_list, test_acc_list = resultado
-    
-    # Imprime os resultados de treinamento e validação
-    print("\n--- Resultados de Treinamento e Validação ---")
-    print("Perdas durante o treinamento por época:")
-    print(train_loss_list)
-    
-    print("\nPerdas durante a validação por época:")
-    print(val_loss_list)
-    
-    print("\nAcurácias durante o treinamento por época:")
-    print(train_acc_list)
-    
-    print("\nAcurácias durante a validação por época:")
-    print(val_acc_list)
-    
-    # Imprime os resultados do teste
-    print("\n--- Resultados de Teste ---")
-    print(f"Perda no teste: {test_loss_list[-1]:.4f}")
-    print(f"Acurácia no teste: {test_acc_list[-1]:.4f}")
-    
-    # Matriz de Confusão
-    conf_mat_val = metrics.confusion_matrix(true_val_list, pred_val_list)
-    print('\nConfusion Matrix (Validation):')
-    print(conf_mat_val)
-
-    # Relatório de Classificação
-    class_rep_val = metrics.classification_report(
-        true_val_list, pred_val_list,
-        target_names=class_names, digits=4, zero_division=0
-    )
-    print('\nClassification Report (Validation):')
-    print(class_rep_val)
-
-    # Acurácia na Validação
-    acc_val = metrics.accuracy_score(true_val_list, pred_val_list)
-    print('\nValidation Accuracy: {:.4f}'.format(acc_val))

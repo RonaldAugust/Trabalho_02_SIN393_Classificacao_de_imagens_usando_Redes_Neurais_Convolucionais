@@ -13,6 +13,9 @@ Como rodar o projeto:
 3 - Ative o ambiente:
     conda activate projeto_visao
 
+3.1 - (Opcional)para rodar em GPU Nvidia
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
 4 - Instale o pip no conda para instalação do requirements.txt:
     conda install pip
 
