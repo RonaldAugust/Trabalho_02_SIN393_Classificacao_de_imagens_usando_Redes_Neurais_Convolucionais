@@ -7,25 +7,19 @@ import torch.nn as nn
 import numpy as np
 
 def criar_dataloaders(dataset_completo, batch_size):
-    # Conjunto de treinamento: 70 %
     train_size = int(0.7 * len(dataset_completo))
-    # Conjunto de validação: 15 %
     val_size = int(0.15 * len(dataset_completo))
-    # Conjunto de teste: 15 %
     test_size = len(dataset_completo) - train_size - val_size
 
-    # Dividindo o conjunto completo
     generator = torch.Generator().manual_seed(42)
     train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(
         dataset_completo, [train_size, val_size, test_size], generator=generator
     )
 
-    # Número de imagens em cada conjunto
     print("Número de imagens no conjunto de treino:", len(train_dataset))
     print("Número de imagens no conjunto de validação:", len(val_dataset))
     print("Número de imagens no conjunto de teste:", len(test_dataset))
 
-    # Definindo os dataloaders
     train_dataloader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
     val_dataloader = torch.utils.data.DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=False)
     test_dataloader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
@@ -55,7 +49,6 @@ def menu_modelo(classes):
         print("Opção inválida, saindo...")
         exit()
 
-    # Inicializar o modelo com base na escolha
     modelo = None
 
     if nome_modelo == "alexnet":
@@ -65,9 +58,9 @@ def menu_modelo(classes):
 
     elif nome_modelo == "SqueezeNet":
         modelo = models.squeezenet1_1(weights='DEFAULT')
-        num_ftrs = modelo.classifier[1].in_channels  # "in_channels" é a entrada da camada final
-        modelo.classifier[1] = nn.Conv2d(num_ftrs, num_classes, kernel_size=(1, 1), stride=(1, 1))  # Substitui por uma camada Conv2d
-        modelo.classifier[1].bias = nn.Parameter(torch.zeros(num_classes))  # Se necessário, inicializa o viés da camada final
+        num_ftrs = modelo.classifier[1].in_channels  
+        modelo.classifier[1] = nn.Conv2d(num_ftrs, num_classes, kernel_size=(1, 1), stride=(1, 1))  
+        modelo.classifier[1].bias = nn.Parameter(torch.zeros(num_classes)) 
 
     elif nome_modelo == "ResNet18":
         modelo = models.resnet18(weights='DEFAULT')
@@ -82,18 +75,14 @@ def menu_modelo(classes):
     return modelo
 
 def treinar_validar_e_testar(modelo, train_dataloader, val_dataloader, test_dataloader, optimizer, criterion, scheduler, epochs, DEVICE):
-# Tempo total do treinamento (treinamento e validação)
     time_total_start = time.time()
 
-# Lista das perdas (loss) e acurácias (accuracy) de treino para cada época.
     train_loss_list = []
     train_acc_list = []
-    
-# Lista das perdas (loss) e acurácias (accuracy) de validação para cada época.    
+        
     val_loss_list = []
     val_acc_list = []
 
-# Lista das perdas (loss) e acurácias (accuracy) de teste para cada época.
     test_loss_list = []
     test_acc_list = []
 
@@ -102,46 +91,32 @@ def treinar_validar_e_testar(modelo, train_dataloader, val_dataloader, test_data
 
     for epoch in range(epochs):
         time_epoch_start = time.time()
-        
-        # Inicia contagem de tempo da época 
+         
         modelo.train()
 
-        # Perda (loss) nesta época
         loss_epoch_train = 0.0
         
-        # Amostras classificadas corretamente nesta época
         hits_epoch_train = 0
 
-        # Iterar ao longo dos lotes do CONJUNTO DE TREINAMENTO
         for inputs, labels in train_dataloader:
             inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
 
-            # Zera os parametros do gradiente
             optimizer.zero_grad()
             
-            # Habilita o cálculo do gradiente
             torch.set_grad_enabled(True)
             
-            # Saída do modelo para o lote
             outputs = modelo(inputs)
             
-            # 'outputs' está em porcentagens. Tomar os maximos como resposta.
             preds = torch.argmax(outputs, dim=1).float()
             
-            # Calcula a perda (loss)
             loss = criterion(outputs, labels)
 
-            # BACKWARD
-            # <-------
             loss.backward()
             
-            # Atualiza os parâmetros da rede
             optimizer.step()
 
-            # Atualiza a perda da época
             loss_epoch_train += loss.item() * inputs.size(0)
             
-            # Atualiza o número de amostras classificadas corretamente na época.
             hits_epoch_train += torch.sum(preds == labels.data)
 
 
@@ -150,17 +125,12 @@ def treinar_validar_e_testar(modelo, train_dataloader, val_dataloader, test_data
         train_loss_list.append(train_loss)
         train_acc_list.append(train_acc)
 
-        # VALIDAÇÃO
-        
         modelo.eval()
         
-        # Pego o numero de perda e o numero de acertos
         loss_epoch_val = 0.0
         
-        # Numero de itens corretos
         hits_epoch_val = 0
 
-        # Iterar ao longo dos lotes do CONJUNTO DE VALIDAÇÃO
         with torch.no_grad():
             for inputs, labels in val_dataloader:
                 inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
@@ -207,48 +177,37 @@ def treinar_validar_e_testar(modelo, train_dataloader, val_dataloader, test_data
     return train_loss_list, val_loss_list, train_acc_list, val_acc_list, test_loss_list, test_acc_list
 
 def avaliar_e_imprimir_resultados(modelo, val_dataloader, dispositivo, class_names, resultado):
-    # Lista com as classes reais e preditas
     true_val_list = []
     pred_val_list = []
-    # Lista com as probabilidades
     prob_val_list = []
 
-    # Itera pelos lotes do conjunto de validação
     for i, (img_list, labelList) in enumerate(val_dataloader):
         if dispositivo.type == 'cuda':
             img_list = img_list.to(dispositivo)
             labelList = labelList.to(dispositivo)
 
-        # Desabilita o cálculo do gradiente durante validação e testes.
         torch.set_grad_enabled(False)
 
-        # Forward pass
         outputs = modelo(img_list)
 
-        # Predição
         preds = torch.argmax(outputs, dim=1)
 
-        # Calcula probabilidades
         outputs_prob = nn.functional.softmax(outputs, dim=1)
         prob_val_batch = np.asarray(outputs_prob.cpu())
 
-        # Classes reais e preditas para este lote
         if dispositivo.type == 'cuda':
             true_val_batch = np.asarray(labelList.cpu())
             pred_val_batch = np.asarray(preds.cpu())
 
-        # Adiciona os dados ao conjunto completo
         for i in range(len(pred_val_batch)):
             true_val_list.append(true_val_batch[i])
             pred_val_list.append(pred_val_batch[i])
             prob_val_list.append(prob_val_batch[i])
 
-    # Confusion Matrix
     conf_mat_val = metrics.confusion_matrix(true_val_list, pred_val_list)
     print('\nConfusion Matrix (Validation):')
     print(conf_mat_val)
 
-    # Classification Report
     class_rep_val = metrics.classification_report(
         true_val_list, pred_val_list, 
         target_names=class_names, digits=4, zero_division=0
@@ -256,7 +215,6 @@ def avaliar_e_imprimir_resultados(modelo, val_dataloader, dispositivo, class_nam
     print('\nClassification Report (Validation):')
     print(class_rep_val)
 
-    # Accuracy
     acc_val = metrics.accuracy_score(true_val_list, pred_val_list)
     print('\nValidation Accuracy: {:.4f}'.format(acc_val))
 
