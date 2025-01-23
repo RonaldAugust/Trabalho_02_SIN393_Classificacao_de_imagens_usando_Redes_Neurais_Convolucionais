@@ -1,7 +1,4 @@
-torch==1.13.1
-torchvision==0.14.1
-numpy==1.23.5
-matplotlib==3.6.2
-seaborn==0.11.2
-scikit-learn==1.0.2
-Pillow==9.3.0
+numpy
+torch
+torchvision
+scikit-learn
