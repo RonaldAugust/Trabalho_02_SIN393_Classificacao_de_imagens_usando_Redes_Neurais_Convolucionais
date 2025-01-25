@@ -11,7 +11,7 @@ Este é o segundo projeto desenvolvido para a disciplina **SIN393 - Visão Compu
   ```
    diretorio_origem = path/to/dataset/on/your-computer
   ```
-- [Vídeo de apresentação do artigo](https://drive.google.com/file/d/1ql6LeT_kobulxMD2izYUPaoVvCyTo7ky/view?usp=sharing)
+- [Vídeo de apresentação do artigo(Youtube)](https://youtu.be/v1ca-sK6eC4)
 
 ## Estrutura do Projeto
 
